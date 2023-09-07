@@ -1,19 +1,24 @@
+// JSON Server module
 const jsonServer = require("json-server");
 const server = jsonServer.create();
-const path = require("path");
-const router = jsonServer.router(path.join(__dirname, "db.json"));
+const router = jsonServer.router("db/db.json");
+
+// Make sure to use the default middleware
 const middlewares = jsonServer.defaults();
 
-// Set default middlewares (logger, static, cors and no-cache)
 server.use(middlewares);
-
-// To handle POST, PUT and PATCH you need to use a body-parser
-// You can use the one used by JSON Server
-server.use(jsonServer.bodyParser);
-
+// Add this before server.use(router)
+server.use(
+  // Add custom route here if needed
+  jsonServer.rewriter({
+    "/api/*": "/$1",
+  })
+);
 server.use(router);
-
-let port = 3000;
-server.listen(port, () => {
-  console.log(`JSON Server is running, port(${port})`);
+// Listen to port
+server.listen(3000, () => {
+  console.log("JSON Server is running");
 });
+
+// Export the Server API
+module.exports = server;
